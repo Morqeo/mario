@@ -5,6 +5,8 @@ import pl.adrianherdzina.components.SpriteRenderer;
 import pl.adrianherdzina.jade.GameObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class Renderer {
@@ -25,19 +27,22 @@ public class Renderer {
     private void add(SpriteRenderer sprite) {
         boolean added = false;
         for (RenderBatch batch : batches) {
-            Texture texture = sprite.getTexture();
-            if (texture == null || (batch.hasTexture(texture) || batch.hasTextureRoom())) {
-                batch.addSprite(sprite);
-                added = true;
-                break;
+            if(batch.hasRoom() && batch.zIndex() == sprite.gameObject.zIndex()){
+                Texture texture = sprite.getTexture();
+                if (texture == null || (batch.hasTexture(texture) || batch.hasTextureRoom())) {
+                    batch.addSprite(sprite);
+                    added = true;
+                    break;
+                }
             }
         }
 
         if (!added) {
-            RenderBatch newBatch = new RenderBatch(MAX_BATCH_SIZE);
+            RenderBatch newBatch = new RenderBatch(MAX_BATCH_SIZE, sprite.gameObject.zIndex());
             newBatch.start();
             batches.add(newBatch);
             newBatch.addSprite(sprite);
+            Collections.sort(batches);
         }
     }
 
