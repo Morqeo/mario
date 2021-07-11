@@ -16,7 +16,7 @@ public class Line2D {
         this.lifetime = lifetime;
     }
 
-    public int beginFrame(){
+    public int beginFrame() {
         this.lifetime--;
         return this.lifetime;
     }
@@ -31,9 +31,5 @@ public class Line2D {
 
     public Vector3f getColor() {
         return color;
-    }
-
-    public int getLifetime() {
-        return lifetime;
     }
 }
