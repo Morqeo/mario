@@ -1,6 +1,7 @@
-package pl.adrianherdzina.jade;
+package pl.adrianherdzina.components;
 
 import com.google.gson.*;
+import pl.adrianherdzina.components.Component;
 
 import java.lang.reflect.Type;
 

@@ -3,12 +3,14 @@ package pl.adrianherdzina.jade;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
+import pl.adrianherdzina.scenes.LevelEditorScene;
+import pl.adrianherdzina.scenes.LevelScene;
+import pl.adrianherdzina.scenes.Scene;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
-import static org.lwjgl.system.MemoryUtil.memPutByte;
 
 public class Window {
     private int width, height;

@@ -3,7 +3,6 @@ package pl.adrianherdzina.components;
 import imgui.ImGui;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
-import pl.adrianherdzina.jade.Component;
 import pl.adrianherdzina.jade.Transform;
 import pl.adrianherdzina.render.Texture;
 

@@ -1,7 +1,5 @@
 package pl.adrianherdzina.components;
 
-import pl.adrianherdzina.jade.Component;
-
 public class FontRenderer extends Component {
 
     @Override

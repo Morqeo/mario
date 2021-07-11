@@ -1,4 +1,7 @@
-package pl.adrianherdzina.jade;
+package pl.adrianherdzina.scenes;
+
+import pl.adrianherdzina.jade.Window;
+import pl.adrianherdzina.scenes.Scene;
 
 public class LevelScene extends Scene {
     public LevelScene(){

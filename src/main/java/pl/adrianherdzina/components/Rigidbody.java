@@ -2,7 +2,6 @@ package pl.adrianherdzina.components;
 
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import pl.adrianherdzina.jade.Component;
 
 public class Rigidbody extends Component {
     private int colliderType = 0;

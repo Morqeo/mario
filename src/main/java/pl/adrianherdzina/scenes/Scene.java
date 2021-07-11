@@ -1,8 +1,13 @@
-package pl.adrianherdzina.jade;
+package pl.adrianherdzina.scenes;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import imgui.ImGui;
+import pl.adrianherdzina.components.Component;
+import pl.adrianherdzina.components.ComponentDeserializer;
+import pl.adrianherdzina.jade.Camera;
+import pl.adrianherdzina.jade.GameObject;
+import pl.adrianherdzina.jade.GameObjectDeserializer;
 import pl.adrianherdzina.render.Renderer;
 
 import java.io.FileWriter;
@@ -98,10 +103,26 @@ public abstract class Scene {
         }
 
         if(!inFile.equals("")){
-            GameObject[] objs = gson.fromJson(inFile, GameObject[].class);
-            for (int i = 0; i < objs.length; i++) {
-                addGameObjectToScene(objs[i]);
+            int maxGoId = -1;
+            int maxCompId = -1;
+            GameObject[] objects = gson.fromJson(inFile, GameObject[].class);
+            for (int i = 0; i < objects.length; i++) {
+                addGameObjectToScene(objects[i]);
+
+                for(Component c : objects[i].getAllComponents()){
+                    if(c.getUid() > maxCompId){
+                        maxCompId = c.getUid();
+                    }
+                }
+                if(objects[i].getUid() > maxGoId){
+                    maxGoId = objects[i].getUid();
+                }
             }
+
+            maxGoId++;
+            maxCompId++;
+            GameObject.init(maxGoId);
+            Component.init(maxCompId);
             this.leveLoaded = true;
         }
     }
