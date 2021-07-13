@@ -10,11 +10,11 @@ import static org.lwjgl.stb.STBImage.*;
 
 public class Texture {
     private String filepath;
-    private int texID;
+    private transient int textureID;
     private int width, height;
 
     public Texture() {
-        texID = -1;
+        textureID = -1;
         width = -1;
         height = -1;
     }
@@ -23,8 +23,8 @@ public class Texture {
         this.filepath = "Generated";
 
         // Generate texture on GPU
-        texID = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, texID);
+        textureID = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, textureID);
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height,
                 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
@@ -34,8 +34,8 @@ public class Texture {
         this.filepath = filepath;
 
         // Generate texture on GPU
-        texID = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, texID);
+        textureID = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, textureID);
 
         // Set texture parameters
         // Repeat image in both directions
@@ -73,7 +73,7 @@ public class Texture {
     }
 
     public void bind() {
-        glBindTexture(GL_TEXTURE_2D, texID);
+        glBindTexture(GL_TEXTURE_2D, textureID);
     }
 
     public void unbind() {
@@ -93,7 +93,7 @@ public class Texture {
     }
 
     public int getId() {
-        return texID;
+        return textureID;
     }
 
     @Override
@@ -102,7 +102,7 @@ public class Texture {
         if (!(o instanceof Texture)) return false;
         Texture oTex = (Texture)o;
         return oTex.getWidth() == this.width && oTex.getHeight() == this.height &&
-                oTex.getId() == this.texID &&
+                oTex.getId() == this.textureID &&
                 oTex.getFilepath().equals(this.filepath);
     }
 }
