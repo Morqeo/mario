@@ -6,6 +6,7 @@ import imgui.callback.ImStrSupplier;
 import imgui.flag.*;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.type.ImBoolean;
+import pl.adrianherdzina.editor.GameViewWindow;
 import pl.adrianherdzina.scenes.Scene;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -182,6 +183,7 @@ public class ImGuiLayer {
         setupDockSpace();
         currentScene.sceneImgui();
         ImGui.showDemoWindow();
+        GameViewWindow.imgui();
         ImGui.end();
         ImGui.render();
 
