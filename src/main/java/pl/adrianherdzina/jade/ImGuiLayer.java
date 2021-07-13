@@ -7,6 +7,8 @@ import imgui.flag.*;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.type.ImBoolean;
 import pl.adrianherdzina.editor.GameViewWindow;
+import pl.adrianherdzina.editor.PropertiesWindow;
+import pl.adrianherdzina.render.PickingTexture;
 import pl.adrianherdzina.scenes.Scene;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -21,8 +23,13 @@ public class ImGuiLayer {
     // LWJGL3 renderer (SHOULD be initialized)
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
 
-    public ImGuiLayer(long glfwWindow) {
+    private GameViewWindow gameViewWindow;
+    private PropertiesWindow propertiesWindow;
+
+    public ImGuiLayer(long glfwWindow, PickingTexture pickingTexture) {
         this.glfwWindow = glfwWindow;
+        this.gameViewWindow = new GameViewWindow();
+        this.propertiesWindow = new PropertiesWindow(pickingTexture);
     }
 
     // Initialize Dear ImGui.
@@ -35,7 +42,7 @@ public class ImGuiLayer {
         // Initialize ImGuiIO config
         final ImGuiIO io = ImGui.getIO();
 
-        io.setIniFilename("imgui.ini"); // Saves windows positions
+        io.setIniFilename("imgui.ini"); // We don't want to save .ini file
         io.setConfigFlags(ImGuiConfigFlags.NavEnableKeyboard); // Navigation with keyboard
         io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
         io.setBackendFlags(ImGuiBackendFlags.HasMouseCursors); // Mouse cursors to display while resizing windows etc.
@@ -95,7 +102,7 @@ public class ImGuiLayer {
             io.setKeyAlt(io.getKeysDown(GLFW_KEY_LEFT_ALT) || io.getKeysDown(GLFW_KEY_RIGHT_ALT));
             io.setKeySuper(io.getKeysDown(GLFW_KEY_LEFT_SUPER) || io.getKeysDown(GLFW_KEY_RIGHT_SUPER));
 
-            if(!io.getWantCaptureKeyboard()){
+            if (!io.getWantCaptureKeyboard()) {
                 KeyListener.keyCallback(w, key, scancode, action, mods);
             }
         });
@@ -121,7 +128,7 @@ public class ImGuiLayer {
                 ImGui.setWindowFocus(null);
             }
 
-            if(!io.getWantCaptureMouse() || !GameViewWindow.getWantCaptureMouse()){
+            if (!io.getWantCaptureMouse() || gameViewWindow.getWantCaptureMouse()) {
                 MouseListener.mouseButtonCallback(w, button, action, mods);
             }
         });
@@ -175,15 +182,17 @@ public class ImGuiLayer {
         imGuiGl3.init("#version 330 core");
     }
 
-    public void update(float deltaTime, Scene currentScene) {
-        startFrame(deltaTime);
+    public void update(float dt, Scene currentScene) {
+        startFrame(dt);
 
         // Any Dear ImGui code SHOULD go between ImGui.newFrame()/ImGui.render() methods
         ImGui.newFrame();
-        setupDockSpace();
-        currentScene.sceneImgui();
+        setupDockspace();
+        currentScene.imgui();
         ImGui.showDemoWindow();
-        GameViewWindow.imgui();
+        gameViewWindow.imgui();
+        propertiesWindow.update(dt, currentScene);
+        propertiesWindow.imgui();
         ImGui.end();
         ImGui.render();
 
@@ -223,7 +232,7 @@ public class ImGuiLayer {
         ImGui.destroyContext();
     }
 
-    private void setupDockSpace() {
+    private void setupDockspace() {
         int windowFlags = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoDocking;
 
         ImGui.setNextWindowPos(0.0f, 0.0f, ImGuiCond.Always);
@@ -234,10 +243,10 @@ public class ImGuiLayer {
                 ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove |
                 ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoNavFocus;
 
-        ImGui.begin("Dockspace", new ImBoolean(true), windowFlags);
+        ImGui.begin("Dockspace Demo", new ImBoolean(true), windowFlags);
         ImGui.popStyleVar(2);
 
-        //Dockspace
+        // Dockspace
         ImGui.dockSpace(ImGui.getID("Dockspace"));
     }
 }

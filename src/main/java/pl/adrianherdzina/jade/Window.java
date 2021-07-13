@@ -13,7 +13,6 @@ import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
-
 public class Window {
     private int width, height;
     private String title;
@@ -131,18 +130,19 @@ public class Window {
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        this.imguiLayer = new ImGuiLayer(glfwWindow);
-        this.imguiLayer.initImGui();
 
         this.framebuffer = new Framebuffer(3840, 2160);
         this.pickingTexture = new PickingTexture(3840, 2160);
         glViewport(0, 0, 3840, 2160);
 
+        this.imguiLayer = new ImGuiLayer(glfwWindow, pickingTexture);
+        this.imguiLayer.initImGui();
+
         Window.changeScene(0);
     }
 
     public void loop() {
-        float beginTime = (float) glfwGetTime();
+        float beginTime = (float)glfwGetTime();
         float endTime;
         float dt = -1.0f;
 
@@ -153,7 +153,7 @@ public class Window {
             // Poll events
             glfwPollEvents();
 
-            //Render pass 1. Render to picking texture
+            // Render pass 1. Render to picking texture
             glDisable(GL_BLEND);
             pickingTexture.enableWriting();
 
@@ -164,16 +164,10 @@ public class Window {
             Renderer.bindShader(pickingShader);
             currentScene.render();
 
-            if(MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)){
-                int x = (int) MouseListener.getScreenX();
-                int y = (int) MouseListener.getScreenY();
-                System.out.println(pickingTexture.readPixel(x, y));
-            }
-
             pickingTexture.disableWriting();
             glEnable(GL_BLEND);
 
-            //Render pass 2. Render actial game
+            // Render pass 2. Render actual game
             DebugDraw.beginFrame();
 
             this.framebuffer.bind();
@@ -191,7 +185,7 @@ public class Window {
             this.imguiLayer.update(dt, currentScene);
             glfwSwapBuffers(glfwWindow);
 
-            endTime = (float) glfwGetTime();
+            endTime = (float)glfwGetTime();
             dt = endTime - beginTime;
             beginTime = endTime;
         }
@@ -223,4 +217,3 @@ public class Window {
         return 16.0f / 9.0f;
     }
 }
-

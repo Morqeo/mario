@@ -27,16 +27,6 @@ public class LevelEditorScene extends Scene {
         levelEditorStuff.addComponent(new MouseControls());
         levelEditorStuff.addComponent(new GridLines());
 
-        loadResources();
-        this.camera = new Camera(new Vector2f(-250, 0));
-        sprites = AssetPool.getSpritesheet("assets/images/spritesheets/decorationsAndBlocks.png");
-        if (levelLoaded) {
-            if(gameObjects.size() > 0){
-                this.activeGameObject = gameObjects.get(0);
-            }
-            return;
-        }
-
 //        obj1 = new GameObject("Object 1", new Transform(new Vector2f(200, 100),
 //                new Vector2f(256, 256)), 2);
 //        obj1Sprite = new SpriteRenderer();
@@ -54,6 +44,10 @@ public class LevelEditorScene extends Scene {
 //        obj2SpriteRenderer.setSprite(obj2Sprite);
 //        obj2.addComponent(obj2SpriteRenderer);
 //        this.addGameObjectToScene(obj2);
+
+        loadResources();
+        this.camera = new Camera(new Vector2f(-250, 0));
+        sprites = AssetPool.getSpritesheet("assets/images/spritesheets/decorationsAndBlocks.png");
     }
 
     private void loadResources() {
