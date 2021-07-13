@@ -4,9 +4,7 @@ import org.joml.Vector2f;
 import org.joml.Vector4f;
 import pl.adrianherdzina.components.SpriteRenderer;
 import pl.adrianherdzina.jade.Window;
-import pl.adrianherdzina.util.AssetPool;
 
-import java.nio.channels.spi.SelectorProvider;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +13,7 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
-public class RenderBatch implements Comparable<RenderBatch>{
+public class RenderBatch implements Comparable<RenderBatch> {
     //Vertex
     //======
     //Pos                   Color                           Text Coords         Texture ID
@@ -25,12 +23,14 @@ public class RenderBatch implements Comparable<RenderBatch>{
     private final int COLOR_SIZE = 4;
     private final int TEXTURE_COORDS_SIZE = 2;
     private final int TEXTURE_ID_SIZE = 1;
+    private final int ENTITY_ID_SIZE = 1;
 
     private final int POS_OFFSET = 0;
     private final int COLOR_OFFSET = POS_OFFSET + POS_SIZE * Float.BYTES;
     private final int TEXTURE_COORDS_OFFSET = COLOR_OFFSET + COLOR_SIZE * Float.BYTES;
-    private final int TEXT_ID_OFFSET = TEXTURE_COORDS_OFFSET + TEXTURE_COORDS_SIZE * Float.BYTES;
-    private final int VERTEX_SIZE = 9;
+    private final int TEXTURE_ID_OFFSET = TEXTURE_COORDS_OFFSET + TEXTURE_COORDS_SIZE * Float.BYTES;
+    private final int ENTITY_ID_OFFSET = TEXTURE_ID_OFFSET + TEXTURE_ID_SIZE * Float.BYTES;
+    private final int VERTEX_SIZE = 10;
     private final int VERTEX_SIZE_BYTES = VERTEX_SIZE * Float.BYTES;
 
     private SpriteRenderer[] sprites;
@@ -42,12 +42,10 @@ public class RenderBatch implements Comparable<RenderBatch>{
     private List<Texture> textures;
     private int vaoID, vboID;
     private int maxBatchSize;
-    private Shader shader;
     private int zIndex;
 
     public RenderBatch(int maxBatchSize, int zIndex) {
         this.zIndex = zIndex;
-        shader = AssetPool.getShader("assets/shaders/default.glsl");
         this.sprites = new SpriteRenderer[maxBatchSize];
         this.maxBatchSize = maxBatchSize;
 
@@ -85,8 +83,11 @@ public class RenderBatch implements Comparable<RenderBatch>{
         glVertexAttribPointer(2, TEXTURE_COORDS_SIZE, GL_FLOAT, false, VERTEX_SIZE_BYTES, TEXTURE_COORDS_OFFSET);
         glEnableVertexAttribArray(2);
 
-        glVertexAttribPointer(3, TEXTURE_ID_SIZE, GL_FLOAT, false, VERTEX_SIZE_BYTES, TEXT_ID_OFFSET);
+        glVertexAttribPointer(3, TEXTURE_ID_SIZE, GL_FLOAT, false, VERTEX_SIZE_BYTES, TEXTURE_ID_OFFSET);
         glEnableVertexAttribArray(3);
+
+        glVertexAttribPointer(4, ENTITY_ID_SIZE, GL_FLOAT, false, VERTEX_SIZE_BYTES, ENTITY_ID_OFFSET);
+        glEnableVertexAttribArray(4);
     }
 
     public void addSprite(SpriteRenderer spriteRenderer) {
@@ -111,22 +112,22 @@ public class RenderBatch implements Comparable<RenderBatch>{
 
     public void render() {
         boolean rebufferData = false;
-        for (int i = 0; i < numSprites ; i++) {
+        for (int i = 0; i < numSprites; i++) {
             SpriteRenderer spriteRenderer = sprites[i];
-            if(spriteRenderer.isDirty()){
+            if (spriteRenderer.isDirty()) {
                 loadVertexProperties(i);
                 spriteRenderer.setClean();
                 rebufferData = true;
             }
         }
 
-        if(rebufferData){
+        if (rebufferData) {
             glBindBuffer(GL_ARRAY_BUFFER, vboID);
             glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
         }
 
         //Use shader
-        shader.use();
+        Shader shader = Renderer.getBoundShader();
         shader.uploadMat4f("uProjection", Window.getScene().camera().getProjectionMatrix());
         shader.uploadMat4f("uView", Window.getScene().camera().getViewMatrix());
         for (int i = 0; i < textures.size(); i++) {
@@ -201,6 +202,9 @@ public class RenderBatch implements Comparable<RenderBatch>{
             //Load texture id
             vertices[offset + 8] = textureId;
 
+            //Load entity id
+            vertices[offset + 9] = sprite.gameObject.getUid() + 1;
+
             offset += VERTEX_SIZE;
         }
     }
@@ -234,15 +238,15 @@ public class RenderBatch implements Comparable<RenderBatch>{
         return this.hasRoom;
     }
 
-    public boolean hasTextureRoom(){
+    public boolean hasTextureRoom() {
         return this.textures.size() < 8;
     }
 
-    public boolean hasTexture(Texture texture){
+    public boolean hasTexture(Texture texture) {
         return this.textures.contains(texture);
     }
 
-    public int zIndex(){
+    public int zIndex() {
         return this.zIndex;
     }
 
