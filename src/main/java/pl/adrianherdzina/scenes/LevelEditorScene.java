@@ -5,8 +5,8 @@ import imgui.ImVec2;
 import org.joml.Vector2f;
 import pl.adrianherdzina.components.*;
 import pl.adrianherdzina.jade.*;
-import pl.adrianherdzina.physics2d.PhysicsSystem2D;
-import pl.adrianherdzina.physics2d.rigidbody.Rigidbody2D;
+import pl.adrianherdzina.physics2dtmp.PhysicsSystem2D;
+import pl.adrianherdzina.physics2dtmp.rigidbody.Rigidbody2D;
 import pl.adrianherdzina.util.AssetPool;
 
 public class LevelEditorScene extends Scene {
