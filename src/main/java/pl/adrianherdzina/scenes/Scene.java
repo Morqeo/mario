@@ -8,6 +8,7 @@ import pl.adrianherdzina.components.ComponentDeserializer;
 import pl.adrianherdzina.jade.Camera;
 import pl.adrianherdzina.jade.GameObject;
 import pl.adrianherdzina.jade.GameObjectDeserializer;
+import pl.adrianherdzina.jade.Transform;
 import pl.adrianherdzina.render.Renderer;
 
 import java.io.FileWriter;
@@ -52,16 +53,14 @@ public abstract class Scene {
         }
     }
 
-    public GameObject getGameObject(int gameObjectId){
+    public GameObject getGameObject(int gameObjectId) {
         Optional<GameObject> result = this.gameObjects.stream()
                 .filter(gameObject -> gameObject.getUid() == gameObjectId)
                 .findFirst();
-
         return result.orElse(null);
     }
 
     public abstract void update(float dt);
-
     public abstract void render();
 
     public Camera camera() {
@@ -70,6 +69,13 @@ public abstract class Scene {
 
     public void imgui() {
 
+    }
+
+    public GameObject createGameObject(String name) {
+        GameObject go = new GameObject(name);
+        go.addComponent(new Transform());
+        go.transform = go.getComponent(Transform.class);
+        return go;
     }
 
     public void saveExit() {
@@ -82,8 +88,8 @@ public abstract class Scene {
         try {
             FileWriter writer = new FileWriter("level.txt");
             List<GameObject> objsToSerialize = new ArrayList<>();
-            for(GameObject obj: this.gameObjects){
-                if(obj.doSerialization()){
+            for (GameObject obj : this.gameObjects) {
+                if (obj.doSerialization()) {
                     objsToSerialize.add(obj);
                 }
             }
