@@ -2,6 +2,7 @@ package pl.adrianherdzina.components;
 
 import imgui.ImGui;
 import imgui.type.ImInt;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import pl.adrianherdzina.jade.GameObject;
@@ -42,30 +43,36 @@ public abstract class Component {
                 String name = field.getName();
 
                 if (type == int.class) {
-                    int val = (int)value;
+                    int val = (int) value;
                     int[] imInt = {val};
                     if (ImGui.dragInt(name + ": ", imInt)) {
                         field.set(this, imInt[0]);
                     }
                 } else if (type == float.class) {
-                    float val = (float)value;
+                    float val = (float) value;
                     float[] imFloat = {val};
                     if (ImGui.dragFloat(name + ": ", imFloat)) {
                         field.set(this, imFloat[0]);
                     }
                 } else if (type == boolean.class) {
-                    boolean val = (boolean)value;
+                    boolean val = (boolean) value;
                     if (ImGui.checkbox(name + ": ", val)) {
                         field.set(this, !val);
                     }
+                } else if (type == Vector2f.class) {
+                    Vector2f val = (Vector2f) value;
+                    float[] imVec = {val.x, val.y};
+                    if (ImGui.dragFloat2(name + ": ", imVec)) {
+                        val.set(imVec[0], imVec[1]);
+                    }
                 } else if (type == Vector3f.class) {
-                    Vector3f val = (Vector3f)value;
+                    Vector3f val = (Vector3f) value;
                     float[] imVec = {val.x, val.y, val.z};
                     if (ImGui.dragFloat3(name + ": ", imVec)) {
                         val.set(imVec[0], imVec[1], imVec[2]);
                     }
                 } else if (type == Vector4f.class) {
-                    Vector4f val = (Vector4f)value;
+                    Vector4f val = (Vector4f) value;
                     float[] imVec = {val.x, val.y, val.z, val.w};
                     if (ImGui.dragFloat4(name + ": ", imVec)) {
                         val.set(imVec[0], imVec[1], imVec[2], imVec[3]);
