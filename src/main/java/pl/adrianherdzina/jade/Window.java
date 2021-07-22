@@ -31,6 +31,7 @@ public class Window implements Observer {
     private static Window window = null;
 
     private static Scene currentScene;
+    private boolean runtimePlaying = false;
 
     private Window() {
         this.width = 1920;
@@ -41,8 +42,9 @@ public class Window implements Observer {
 
     public static void changeScene(SceneInitializer sceneInitializer) {
         if(currentScene != null){
-            //destroy it
+            currentScene.destroy();
         }
+        getImguiLayer().getPropertiesWindow().setActiveGameObject(null);
         currentScene = new Scene(sceneInitializer);
         currentScene.load();
         currentScene.init();
@@ -170,7 +172,11 @@ public class Window implements Observer {
             if (dt >= 0) {
                 DebugDraw.draw();
                 Renderer.bindShader(defaultShader);
-                currentScene.update(dt);
+                if(runtimePlaying){
+                    currentScene.update(dt);
+                }else{
+                    currentScene.editorUpdate(dt);
+                }
                 currentScene.render();
             }
             this.framebuffer.unbind();
@@ -184,7 +190,6 @@ public class Window implements Observer {
             beginTime = endTime;
         }
 
-        currentScene.saveExit();
     }
 
     public static int getWidth() {
@@ -217,10 +222,22 @@ public class Window implements Observer {
 
     @Override
     public void onNotify(GameObject object, Event event){
-        if(event.type == EventType.GameEngineStartPlay){
-            System.out.println("Start");
-        }else if(event.type == EventType.GameEngineStopPlay){
-            System.out.println("Stop");
+        switch (event.type){
+            case GameEngineStartPlay:
+                this.runtimePlaying = true;
+                currentScene.save();
+                Window.changeScene(new LevelEditorSceneInitializer());
+                break;
+            case GameEngineStopPlay:
+                this.runtimePlaying = false;
+                Window.changeScene(new LevelEditorSceneInitializer());
+                break;
+            case LoadLevel:
+                Window.changeScene(new LevelEditorSceneInitializer());
+                break;
+            case SaveLevel:
+                currentScene.save();
+                break;
         }
     }
 }

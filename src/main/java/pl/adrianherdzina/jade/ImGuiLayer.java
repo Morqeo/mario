@@ -1,12 +1,16 @@
 package pl.adrianherdzina.jade;
 
-import imgui.*;
+import imgui.ImFontAtlas;
+import imgui.ImFontConfig;
+import imgui.ImGui;
+import imgui.ImGuiIO;
 import imgui.callback.ImStrConsumer;
 import imgui.callback.ImStrSupplier;
 import imgui.flag.*;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.type.ImBoolean;
 import pl.adrianherdzina.editor.GameViewWindow;
+import pl.adrianherdzina.editor.MenuBar;
 import pl.adrianherdzina.editor.PropertiesWindow;
 import pl.adrianherdzina.render.PickingTexture;
 import pl.adrianherdzina.scenes.Scene;
@@ -25,11 +29,13 @@ public class ImGuiLayer {
 
     private GameViewWindow gameViewWindow;
     private PropertiesWindow propertiesWindow;
+    private MenuBar menuBar;
 
     public ImGuiLayer(long glfwWindow, PickingTexture pickingTexture) {
         this.glfwWindow = glfwWindow;
         this.gameViewWindow = new GameViewWindow();
         this.propertiesWindow = new PropertiesWindow(pickingTexture);
+        this.menuBar = new MenuBar();
     }
 
     // Initialize Dear ImGui.
@@ -194,6 +200,7 @@ public class ImGuiLayer {
         gameViewWindow.imgui();
         propertiesWindow.update(dt, currentScene);
         propertiesWindow.imgui();
+        menuBar.imgui();
         ImGui.end();
         ImGui.render();
 
