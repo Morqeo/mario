@@ -10,7 +10,6 @@ import pl.adrianherdzina.util.AssetPool;
 public class LevelEditorSceneInitializer extends SceneInitializer {
 
     private Spritesheet sprites;
-
     private GameObject levelEditorStuff;
 
     public LevelEditorSceneInitializer() {
@@ -22,7 +21,7 @@ public class LevelEditorSceneInitializer extends SceneInitializer {
         sprites = AssetPool.getSpritesheet("assets/images/spritesheets/decorationsAndBlocks.png");
         Spritesheet gizmos = AssetPool.getSpritesheet("assets/images/gizmos.png");
 
-        levelEditorStuff = scene.createGameObject("Level Editor");
+        levelEditorStuff = scene.createGameObject("LevelEditor");
         levelEditorStuff.setNoSerialize();
         levelEditorStuff.addComponent(new MouseControls());
         levelEditorStuff.addComponent(new GridLines());
@@ -78,7 +77,7 @@ public class LevelEditorSceneInitializer extends SceneInitializer {
 
             ImGui.pushID(i);
             if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y)) {
-                GameObject object = Prefabs.generateSpriteObject(sprite, 32, 32);
+                GameObject object = Prefabs.generateSpriteObject(sprite, 0.25f, 0.25f);
                 levelEditorStuff.getComponent(MouseControls.class).pickupObject(object);
             }
             ImGui.popID();

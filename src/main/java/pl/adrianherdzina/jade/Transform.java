@@ -37,8 +37,8 @@ public class Transform extends Component {
     public void imgui() {
         JImGui.drawVec2Control("Position", this.position);
         JImGui.drawVec2Control("Scale", this.scale, 32.0f);
-        JImGui.dragFloat("Rotation", this.rotation);
-        JImGui.dragInt("Z-Index", this.zIndex);
+        this.rotation = JImGui.dragFloat("Rotation", this.rotation);
+        this.zIndex = JImGui.dragInt("Z-Index", this.zIndex);
     }
 
     public void copy(Transform to) {
@@ -51,7 +51,7 @@ public class Transform extends Component {
         if (o == null) return false;
         if (!(o instanceof Transform)) return false;
 
-        Transform t = (Transform)o;
+        Transform t = (Transform) o;
         return t.position.equals(this.position) && t.scale.equals(this.scale) &&
                 t.rotation == this.rotation && t.zIndex == this.zIndex;
     }

@@ -25,7 +25,9 @@ public abstract class Component {
 
     }
 
-    public void editorUpdate(float dt){}
+    public void editorUpdate(float dt) {
+
+    }
 
     public void imgui() {
         try {
@@ -68,6 +70,13 @@ public abstract class Component {
                 } else if (type == Vector4f.class) {
                     Vector4f val = (Vector4f)value;
                     JImGui.colorPicker4(name, val);
+                } else if (type.isEnum()) {
+                    String[] enumValues = getEnumValues(type);
+                    String enumType = ((Enum)value).name();
+                    ImInt index = new ImInt(indexOf(enumType, enumValues));
+                    if (ImGui.combo(field.getName(), index, enumValues, enumValues.length)) {
+                        field.set(this, type.getEnumConstants()[index.get()]);
+                    }
                 }
 
 
@@ -86,7 +95,27 @@ public abstract class Component {
         }
     }
 
-    public void destroy(){
+    private <T extends Enum<T>> String[] getEnumValues(Class<T> enumType) {
+        String[] enumValues = new String[enumType.getEnumConstants().length];
+        int i = 0;
+        for (T enumIntegerValue : enumType.getEnumConstants()) {
+            enumValues[i] = enumIntegerValue.name();
+            i++;
+        }
+        return enumValues;
+    }
+
+    private int indexOf(String str, String[] arr) {
+        for (int i=0; i < arr.length; i++) {
+            if (str.equals(arr[i])) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    public void destroy() {
 
     }
 
