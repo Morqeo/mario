@@ -3,6 +3,7 @@ package pl.adrianherdzina.scenes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import imgui.ImGui;
+import org.joml.Vector2f;
 import pl.adrianherdzina.components.Component;
 import pl.adrianherdzina.components.ComponentDeserializer;
 import pl.adrianherdzina.jade.Camera;
@@ -19,24 +20,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class Scene {
+public class Scene {
 
-    protected Renderer renderer = new Renderer();
-    protected Camera camera;
+    private Renderer renderer = new Renderer();
+    private Camera camera;
     private boolean isRunning = false;
-    protected List<GameObject> gameObjects = new ArrayList<>();
-    protected boolean levelLoaded = false;
+    private List<GameObject> gameObjects = new ArrayList<>();
+    private boolean levelLoaded = false;
 
-    public Scene() {
+    private SceneInitializer sceneInitializer;
 
+    public Scene(SceneInitializer sceneInitializer) {
+        this.sceneInitializer = sceneInitializer;
     }
 
     public void init() {
-
+        this.camera = new Camera(new Vector2f(-250, 0));
+        this.sceneInitializer.loadResources(this);
+        this.sceneInitializer.init(this);
     }
 
     public void start() {
-        for (GameObject go : gameObjects) {
+        for (int i = 0; i < gameObjects.size(); i++) {
+            GameObject go = gameObjects.get(i);
             go.start();
             this.renderer.add(go);
         }
@@ -53,6 +59,10 @@ public abstract class Scene {
         }
     }
 
+    public List<GameObject> getGameObjects(){
+        return this.gameObjects;
+    }
+
     public GameObject getGameObject(int gameObjectId) {
         Optional<GameObject> result = this.gameObjects.stream()
                 .filter(gameObject -> gameObject.getUid() == gameObjectId)
@@ -60,15 +70,24 @@ public abstract class Scene {
         return result.orElse(null);
     }
 
-    public abstract void update(float dt);
-    public abstract void render();
+    public void update(float dt) {
+        this.camera.adjustProjection();
+
+        for (GameObject go : this.gameObjects) {
+            go.update(dt);
+        }
+    }
+
+    public void render() {
+        this.renderer.render();
+    }
 
     public Camera camera() {
         return this.camera;
     }
 
     public void imgui() {
-
+        this.sceneInitializer.imgui();
     }
 
     public GameObject createGameObject(String name) {
@@ -95,7 +114,7 @@ public abstract class Scene {
             }
             writer.write(gson.toJson(objsToSerialize));
             writer.close();
-        } catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -118,7 +137,7 @@ public abstract class Scene {
             int maxGoId = -1;
             int maxCompId = -1;
             GameObject[] objs = gson.fromJson(inFile, GameObject[].class);
-            for (int i=0; i < objs.length; i++) {
+            for (int i = 0; i < objs.length; i++) {
                 addGameObjectToScene(objs[i]);
 
                 for (Component c : objs[i].getAllComponents()) {
